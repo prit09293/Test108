@@ -71,9 +71,7 @@ async def list_admins(client, message):
 async def afk_cmd(client, message: Message):
     reason = message.text.split(None, 1)[1] if len(message.command) > 1 else ""
     set_afk(message.from_user.id, reason)
-    await message.reply("AFK set." + (f"
-Reason: {reason}" if reason else ""))
-
+    await message.reply("AFK set." + (f"\nReason: {reason}" if reason else ""))
 @app.on_message(filters.group & ~filters.service)
 async def return_afk(client, message: Message):
     uid = message.from_user.id
