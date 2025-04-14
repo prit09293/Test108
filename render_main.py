@@ -329,9 +329,8 @@ async def check_afk(client, message: Message):
             time_str = f"{elapsed // 60} minutes {elapsed % 60} seconds"
 
         msg = (
-            f"{message.from_user.first_name} 𝖨𝗌 𝖯𝗅𝖺𝗒𝗂𝗇𝗀 𝖲𝗊𝗎𝗂𝖽 𝖦𝖺𝗆𝖾, "
-            f"𝖧𝖾 𝖶𝗂𝗅𝗅 𝖢𝗈𝗆𝖾 𝖡𝖺𝖼𝗄 𝖠𝖿𝗍𝖾𝗋 𝖶𝗂𝗇𝗇𝗂𝗇𝗀 𝖠 𝖫𝗈𝗍 𝖮𝖿 𝖬𝗈𝗇𝖾𝗒.
-
+            f"{message.from_user.first_name} "
+        
 "
             f"**Thought**: {thought}"
             f"\n**𝖠𝖥𝖪 𝖿𝗈𝗋**: {time_str}"
