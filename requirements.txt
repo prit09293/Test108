@@ -1,0 +1,7 @@
+pyrogram
+tgcrypto
+flask
+requests
+Pillow
+whisper
+pymongo
