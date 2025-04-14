@@ -6,6 +6,7 @@ import requests
 import openai
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from PIL import Image
 from flask import Flask
 
@@ -172,63 +173,53 @@ async def suho_openrouter(client, message: Message):
         await message.reply(reply)
     except Exception as e:
         await message.reply(f"**Suho error:** `{e}`")
-
-@app.on_message(filters.command("openai") & is_admin())
-async def openai_chat(client, message: Message):
-    if len(message.command) < 2:
-        return await message.reply("Send something like: `/openai write a poem about stars`")
-
-    prompt = message.text.split(None, 1)[1]
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=1000
-        )
-        reply = response['choices'][0]['message']['content'].strip()
-        await message.reply(reply)
-    except Exception as e:
-        await message.reply(f"**OpenAI Error:** `{e}`")
-
-@app.on_message(filters.command("openaiimg") & is_admin())
-async def openai_image(client, message: Message):
-    if len(message.command) < 2:
-        return await message.reply("Send a prompt like: `/openaiimg flying pizza in space`")
-
-    prompt = message.text.split(None, 1)[1]
-    try:
-        response = openai.Image.create(
-            prompt=prompt,
-            n=1,
-            size="512x512"
-        )
-        image_url = response['data'][0]['url']
-        await message.reply_photo(image_url, caption=f"**Prompt:** `{prompt}`")
-    except Exception as e:
-        await message.reply(f"**OpenAI Image Error:** `{e}`")
-
+        
 @app.on_message(filters.command("upscale") & is_admin())
-async def upscale_image(client, message: Message):
+async def upscale_choose(client, message: Message):
     if not message.reply_to_message or not message.reply_to_message.photo:
-        return await message.reply("Reply to an image to upscale.")
+        return await message.reply("Reply to a photo with `/upscale` to choose scale.")
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton(f"{factor}×", callback_data=f"upscale_{factor}")]
+        for factor in [2, 4, 6, 8, 10, 16]
+    ])
+
+    await message.reply("Choose upscale factor:", reply_markup=keyboard)
+
+@app.on_callback_query(filters.regex(r"upscale_(\d+)"))
+async def handle_upscale_callback(client, callback: CallbackQuery):
+    if not callback.message.reply_to_message or not callback.message.reply_to_message.photo:
+        return await callback.answer("Photo not found.", show_alert=True)
+
+    factor = int(callback.data.split("_")[1])
+    await callback.answer(f"Upscaling {factor}×...", show_alert=False)
 
     try:
-        photo = await message.reply_to_message.download()
+        photo = await callback.message.reply_to_message.download()
         img = Image.open(photo)
 
-        # 2x upscale
         width, height = img.size
-        upscaled = img.resize((width * 2, height * 2), Image.LANCZOS)
+        upscaled = img.resize((width * factor, height * factor), Image.LANCZOS)
 
-        output_path = "upscaled.png"
+        output_path = f"upscaled_{factor}x.png"
         upscaled.save(output_path)
 
-        await message.reply_photo(output_path, caption="Here’s your 2× upscaled image.")
+        await client.send_document(
+            chat_id=callback.from_user.id,
+            document=output_path,
+            caption=f"Here’s your {factor}× upscaled image."
+        )
+
+        await callback.message.reply_document(
+            output_path,
+            caption=f"Upscaled to {factor}× successfully!"
+        )
+
         os.remove(output_path)
         os.remove(photo)
 
     except Exception as e:
-        await message.reply(f"**Upscale error:** `{e}`")
+        await callback.message.reply(f"**Upscale error:** `{e}`")
 
 # --- Flask app for Render health check ---
 web = Flask(__name__)
