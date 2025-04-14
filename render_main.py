@@ -65,9 +65,7 @@ async def add_admin(client, message):
 async def list_admins(client, message):
     all_ids = admins_col.find()
     ids = [str(doc["_id"]) for doc in all_ids]
-    await message.reply("Admins:
-" + "
-".join(ids))
+    await message.reply("Admins:\n" + "\n".join(ids))
 
 @app.on_message(filters.command("afk"))
 async def afk_cmd(client, message: Message):
