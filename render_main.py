@@ -3,7 +3,6 @@ import os
 import io
 import contextlib
 import requests
-import openai
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
@@ -14,10 +13,8 @@ API_ID = 20167916
 API_HASH = "325de70c258003ff1c30fb02077dde25"
 BOT_TOKEN = "8173268123:AAGAKuPh7up7VyQ0VBFgwqRnbIcIC6lbd54"
 OWNER_ID = 6672752177
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 
-openai.api_key = OPENAI_API_KEY
 ADMINS_FILE = "admins.json"
 
 if not os.path.exists(ADMINS_FILE):
@@ -65,8 +62,7 @@ async def help_cmd(client, message: Message):
         "/removeadmin - Remove admin\n"
         "/admins - List admins\n"
         "/suho <prompt> - AI chat via OpenRouter\n"
-        "/openai <prompt> - AI chat via OpenAI\n"
-        "/openaiimg <prompt> - Generate image via OpenAI\n"
+        "/afk - away\n"
         "/upscale - Reply to image to upscale"
     )
 
