@@ -330,8 +330,6 @@ async def check_afk(client, message: Message):
 
         msg = (
             f"{message.from_user.first_name} "
-        
-"
             f"**Thought**: {thought}"
             f"\n**𝖠𝖥𝖪 𝖿𝗈𝗋**: {time_str}"
             f"\n**𝖱𝖾𝖺𝗌𝗈𝗇**: {reason}"
